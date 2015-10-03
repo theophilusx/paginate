@@ -3,34 +3,33 @@
 This is just a very simple example of how to implement pagination using reagent and
 bootstrap. .The idea is to create a data structure which consists of hash maps where
 each key is a page number and the value is a vector of records or items to be
-displayed on that page. In the example, a temporary data structure is used with dummy
-values. The pager component takes a sorted list of the page numbers and renders them
-as a pagination list along the top of the page. When you click on one of the page
-links, the records corresponding to that page are displayed.
+displayed on that page. To handle more pages than would fit in one index line, a
+further data structure consisting of an index of page indexes is used. 
 
-The principal is pretty simple. The component maintains a :pager-current-page value
-in the state atom. When you click on one of the pages, this value is updated with the
-corresponding number of the page. Another render function then renders the records
-from the hash map which correspond to that index. 
+In the example, the function `init-pager` is used to setup the necessary data
+structures and state information used by this simple component. The current index and
+current page are stored in the session state atom. When the user clicks on an index,
+it sets the current index. This value is used to lookup the records in the data index
+to display on that page. The previous and next links move to the previous or next
+index. This could involve moving to the previous or next page of indexes.
 
-See the `data` var to see how records can easily be partitioned and an indexed map
-build to use for the pager component.
+the pager-init function takes a page size and index size argument. The page size
+determines how many records are to be displayed on each page. This also determine the
+number of indexes which will exist i.e. total number of records / page size. The
+index size determines home many page indexes are displayed in the index bar at the
+top.
 
-## Todo
+The page-init also accepts a collection which represents the collection of
+records. It will build the necessary indexes from this collection. 
 
-Really should create a records per page i.e. [;pager :page-size] value in the state
-and use that to partition the records up into pages for display. You could then have
-a simple input component which would allow the user to set the number of records per
-page.
+The principal is pretty simple. The component maintains a :current-index value in the
+state atom. When you click on one of the pages indexes, this value is updated with
+the corresponding number of the page. Another component then renders the
+records from the data list which correspond to that index page.
 
-Need to implement a way to allow for large numbers of pages such that only a subset
-are shown at once and the numbers slide to show subsets. Currently, if you have more
-pages than can fit on the width of the page, they will wrap and create multiple lines
-of pages - works fine, but is pretty ugly. An easy way to do this would be to move
-the data structure down another level, so that you have an outer level of page
-*windows*, where each *window* contains a list of the hash maps to be displayed in
-that window. You could then use a [:pager :window] value in the session state to
-track which window you are displaying. When you try to move to previous or next and
-you are at the first or last item in that window, it will decrement/increment the
-window and display the indexes from that window.  
+## Warning
 
+This was really just an experiment I used to understand Reagent a little better. In
+reality, you could probably use one of the existing React pagination components to do
+this. However, I haven't progressed that far yet! This one got the job done for
+now. use at your own risk!

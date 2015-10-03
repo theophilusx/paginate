@@ -10,32 +10,44 @@
 ;; -------------------------
 ;; Views
 
-(defonce data (apply merge (map-indexed
-                        (fn [i v] {i (vec v)})
-                        (partition 10 10 nil
-                                   (map #(str "Record " %)
-                                        (range 100))))))
+;; (defonce data (apply merge (map-indexed
+;;                         (fn [i v] {i (vec v)})
+;;                         (partition 10 10 nil
+;;                                    (map #(str "Record " %)
+;;                                         (range 100))))))
+
+(defonce data (vec (map #(str "Record " %) (range 200))))
 
 (defn page-header [title]
   [:div.row
    [:div.page-header
     [:h1 title]]])
 
-(defn show-page [p]
+;; (defn show-page [data idx]
+;;   (.log js/console "show-page")
+;;   [:div
+;;    (into [:ul]
+;;          (for [r (get data idx)]
+;;             [:li (str r)]))])
+
+(defn show-page [data-idx]
   [:div
    (into [:ul]
-         (for [i (get data p)]
-           [:li (str i)]))])
+         (for [r (get data-idx (pager/get-current-index))]
+           [:li (str r)]))])
 
 (defn home-page []
-  [:div.container
-   [page-header "Home Page"]
-   [:div.row
-    [:div.col-md-12
-     [:a {:href "#/about"} "go to about page"]
-     [pager/header (sort (keys data))]
-     (when (pager/get-pager-current)
-       [show-page (pager/get-pager-current)])]]])
+  (let [page-index (pager/init-pager 10 10 data)]
+    [:div.container
+     [page-header "Home Page"]
+     [:div.row
+      [:div.col-md-12
+       [:a {:href "#/about"} "go to about page"]
+       [pager/header]]]
+     [:div.row
+      [:div.col-md-12
+       [show-page page-index]]]]))
+
 
 (defn about-page []
   [:div.container
